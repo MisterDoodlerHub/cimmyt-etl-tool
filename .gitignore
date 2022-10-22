@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+test_scripts/
+Sample_DB.xlsx
