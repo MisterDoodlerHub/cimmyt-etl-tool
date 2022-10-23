@@ -55,6 +55,7 @@ app.layout = html.Div(children=[
 def upload_success(raw_contents, file_name):
     try:
         if raw_contents is not None:
+            df = get_raw_data(raw_contents, file_name)
             children = [
             html.H5(file_name),
             html.H5("Data upload successful", style={'color':'green'}),
