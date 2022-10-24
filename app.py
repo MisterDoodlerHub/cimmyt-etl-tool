@@ -19,6 +19,8 @@ INSTRUCTIONS = """
 - Click on **'Transform Data'** Button to process your data.
 """
 
+TRANSFORM_OPTIONS = ["Soil Classification", "Some Other Task"]
+
 app.layout = html.Div(children=[
     html.H1(children='DEMO ETL TOOL', style={'textAlign': 'center'}),
     dcc.Markdown(INSTRUCTIONS, style={'textAlign': 'center'}),
@@ -35,15 +37,32 @@ app.layout = html.Div(children=[
             'borderStyle': 'dashed',
             'borderRadius': '5px',
             'textAlign': 'center',
-            'margin': '10px'
+            'margin': '20px'
         },
         multiple=False
     ),
     html.Div(id='upload-success'),
-    html.Button("Transform Data", id='btn-transform'),
-    html.H4(),
-    html.Div(id='output-datatable'),
-    html.Button("Download Processed Data", id='btn-download'),
+    html.Div([
+        html.H4("Select Your Task:", style={"margin":'10px'}),    
+        dcc.Dropdown(TRANSFORM_OPTIONS, id = 'task-select',
+        style={
+                'width': '250px',
+                'height': '30px',
+                'borderWidth': '1px',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px'
+            }),
+    ]),
+
+    html.Div([
+        html.Button("Transform Data", id='btn-transform'),
+        html.H4(),
+        html.Div(id='output-datatable'),
+        html.Button("Download Processed Data", id='btn-download'),
+    ], style={"margin":'20px'}),
+
+    
     dcc.Download(id='download-dataframe-as-csv')
 ])
 
@@ -68,17 +87,21 @@ def upload_success(raw_contents, file_name):
 @app.callback(
     Output('output-datatable', 'children'),
     Input('btn-transform',"n_clicks"),
+    Input('task-select','value'),
     Input('upload-data','contents'),
     State('upload-data','filename'),
     prevent_initial_call=True
 )
-def transform_fn(n_clicks, raw_contents, file_name):
+def transform_fn(n_clicks, task_select, raw_contents, file_name):
     if not n_clicks:
         PreventUpdate
     else:
         if raw_contents is not None:
             df = get_raw_data(raw_contents, file_name)
-            df = soil_texture_classification(df)
+            if task_select == TRANSFORM_OPTIONS[0]:
+                df = soil_texture_classification(df)
+            else:
+                pass
             return show_data(df)
 
 
